@@ -24,10 +24,12 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Union, Generic
 
 from discord.errors import ClientException, DiscordException
 from discord.utils import _human_join
+
+from ._types import BotT
 
 if TYPE_CHECKING:
     from discord.abc import GuildChannel
@@ -35,7 +37,6 @@ if TYPE_CHECKING:
     from discord.types.snowflake import Snowflake, SnowflakeList
     from discord.app_commands import AppCommandError
 
-    from ._types import BotT
     from .context import Context
     from .converter import Converter
     from .cooldowns import BucketType, Cooldown
@@ -235,7 +236,7 @@ class CheckFailure(CommandError):
     pass
 
 
-class CheckAnyFailure(CheckFailure):
+class CheckAnyFailure(Generic[BotT], CheckFailure):
     """Exception raised when all predicates in :func:`check_any` fail.
 
     This inherits from :exc:`CheckFailure`.
@@ -869,7 +870,7 @@ class BotMissingPermissions(CheckFailure):
 
 
 class BadUnionArgument(UserInputError):
-    """Exception raised when a :data:`typing.Union` converter fails for all
+    """Exception raised when a :obj:`typing.Union` converter fails for all
     its associated types.
 
     This inherits from :exc:`UserInputError`
@@ -924,7 +925,7 @@ class BadLiteralArgument(UserInputError):
         .. versionadded:: 2.3
     """
 
-    def __init__(self, param: Parameter, literals: Tuple[Any, ...], errors: List[CommandError], argument: str = "") -> None:
+    def __init__(self, param: Parameter, literals: Tuple[Any, ...], errors: List[CommandError], argument: str = '') -> None:
         self.param: Parameter = param
         self.literals: Tuple[Any, ...] = literals
         self.errors: List[CommandError] = errors
@@ -1080,7 +1081,7 @@ class ExtensionNotFound(ExtensionError):
     """
 
     def __init__(self, name: str) -> None:
-        msg = f'Extension {name!r} could not be loaded.'
+        msg = f'Extension {name!r} could not be loaded or found.'
         super().__init__(msg, name=name)
 
 
